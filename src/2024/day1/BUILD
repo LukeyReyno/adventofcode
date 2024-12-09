@@ -11,6 +11,7 @@ cc_binary(
     ],
     deps = [
         "//common/logging",
+        "//common/string",
     ],
 )
 
