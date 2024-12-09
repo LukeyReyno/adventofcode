@@ -61,7 +61,7 @@ std::string GetTimestamp() {
 template <typename T, typename... Args>
 void FormatMessage(std::stringstream& logMessage, const T& message, Args &&...args) {
   logMessage << message;
-  (logMessage << ... << args);
+  (void)(logMessage << ... << args);
 }
 
 } // namespace
@@ -81,6 +81,11 @@ void Log(LogLevel level, const char* message, Args &&...args) {
   FormatMessage(logMessage, message, std::forward<Args>(args)...);
 
   ostream << logMessage.str() << std::endl;
+}
+
+template <typename... Args>
+void Log(const char* message, Args &&...args) {
+  Log(LogLevel::INFO, message, args...);
 }
 
 } // namespace AOC
