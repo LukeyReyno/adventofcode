@@ -22,7 +22,7 @@ class String : public std::string {
       return *this;
     }
 
-    std::vector<String> split(const String& delimiter);
+    std::vector<String> split(const String& delimiter) const;
 };
 
 } // namespace AOC

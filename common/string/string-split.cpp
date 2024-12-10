@@ -4,7 +4,7 @@
 
 namespace AOC {
 
-std::vector<String> String::split(const String& delimiter) {
+std::vector<String> String::split(const String& delimiter) const {
   size_t pos_start = 0, pos_end, delim_len = delimiter.length();
   String token;
   std::vector<String> res;
