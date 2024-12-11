@@ -25,7 +25,6 @@ std::ifstream readFileToStream(const AOC::String& inputFilePath) {
   return inputFile;
 }
 
-// Brute Force Search
 int search(const std::vector<std::string> &wordsearchMat) {
   AOC::String targetStr = "XMAS";
   int found = 0;
@@ -137,6 +136,83 @@ int search(const std::vector<std::string> &wordsearchMat) {
   return found;
 }
 
+enum XPattern {
+  DOWN,
+  RIGHT,
+  UP,
+  LEFT,
+};
+
+std::vector<int> getPatternIndices(XPattern pattern, int rowIdx, int colIdx, int targetLen, int i) {
+  switch (pattern) {
+    case DOWN:
+      return {
+            rowIdx + i,
+            colIdx + i,
+            rowIdx + i,
+            colIdx - i + (targetLen - 1)
+          };
+    case RIGHT:
+      return {
+            rowIdx + i,
+            colIdx + i,
+            rowIdx - i + (targetLen - 1),
+            colIdx + i
+          };
+    case UP:
+      return {
+            rowIdx - i + (targetLen - 1),
+            colIdx - i + (targetLen - 1),
+            rowIdx - i + (targetLen - 1),
+            colIdx + i
+          };
+    case LEFT:
+      return {
+            rowIdx + i,
+            colIdx - i + (targetLen - 1),
+            rowIdx - i + (targetLen - 1),
+            colIdx - i + (targetLen - 1),
+          };
+  }
+}
+
+int search2(const std::vector<std::string> &wordsearchMat) {
+  AOC::String targetStr = "MAS";
+  int found = 0;
+
+  const int height = wordsearchMat.size();
+  const int width = wordsearchMat[0].length();
+
+  const std::vector<XPattern> patterns = {DOWN, RIGHT, UP, LEFT};
+
+  for (int rowIdx = 0; rowIdx < height; rowIdx++) {
+    for (int colIdx = 0; colIdx < width; colIdx++) {
+      for (int j = 0; j < patterns.size(); j++) {
+        for (int i = 0; i < targetStr.length(); i++) {
+          const std::vector<int> diagIndices = getPatternIndices(patterns[j], rowIdx, colIdx, targetStr.length(), i);
+          const int diag1RowIdx = diagIndices[0];
+          const int diag1ColIdx = diagIndices[1];
+          const int diag2RowIdx = diagIndices[2];
+          const int diag2ColIdx = diagIndices[3];
+          if ((0 <= diag1RowIdx && diag1RowIdx < height) && (0 <= diag2RowIdx && diag2RowIdx < height) &&
+            (0 <= diag1ColIdx && diag1ColIdx < width) && (0 <= diag2ColIdx && diag2ColIdx < width) &&
+            wordsearchMat[diag1RowIdx][diag1ColIdx] == targetStr[i] &&
+            wordsearchMat[diag2RowIdx][diag2ColIdx] == targetStr[i]) {
+            if (i == targetStr.length() - 1) {
+              found++;
+            }
+            continue;
+          }
+
+          break;
+        }
+      }
+    }
+  }
+
+  return found;
+}
+
 }
 
 // https://adventofcode.com/2024/day/1
@@ -146,6 +222,9 @@ int main() {
   // Find how many times XMAS appears in the wordsearch.
   // Forwards, backwards, up, down, diagonals + backwards diagonals.
   int totalXmas = 0;
+
+  // Find how many times MAS is in an X (cross)
+  int totalXmas2 = 0;
 
   AOC::Log("Opening file ", inputFilePath);
   std::ifstream inputFile = readFileToStream(inputFilePath);
@@ -159,8 +238,10 @@ int main() {
 
   AOC::Log("Searching for 'XMAS'");
   totalXmas = search(wordsearchMat);
+  totalXmas2 = search2(wordsearchMat);
 
   AOC::Log("Part 1 - The total number of XMAS in the wordsearch: ", totalXmas);
+  AOC::Log("Part 2 - The total number of X-MAS in the wordsearch: ", totalXmas2);
 
   return 0;
 }
